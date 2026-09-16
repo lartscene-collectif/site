@@ -1,0 +1,173 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { resolveAsset } from '../lib/assets';
+import type { ImageMetadata } from 'astro';
+
+interface Slide {
+  id: string;
+  name: string;
+  cover: ImageMetadata;
+}
+
+const slides: Slide[] = (await getCollection('artistes'))
+  .map((entry) => ({
+    id: entry.id,
+    name: entry.data.nom || "",
+    cover: resolveAsset(entry.id+".jpg")
+  }))
+  .filter((s): s is Slide => Boolean(s.cover));
+---
+
+{slides.length > 0 && (
+  <section class="carousel" data-carousel aria-roledescription="carousel">
+    <div class="slides">
+      {slides.map((slide, i) => (
+        <a
+          href={'/artistes/' + slide.id}
+          class:list={['slide', { active: i === 0 }]}
+          data-slide
+          aria-hidden={i === 0 ? 'false' : 'true'}
+        >
+          <Image src={slide.cover} alt={slide.name || ""} class="cover" />
+          <span class="name">{slide.name}</span>
+        </a>
+      ))}
+    </div>
+    <button type="button" class="arrow prev" data-prev aria-label="Artiste précédent">&lt;</button>
+    <button type="button" class="arrow next" data-next aria-label="Artiste suivant">&gt;</button>
+  </section>
+)}
+
+<script>
+  const root = document.querySelector('[data-carousel]');
+  if (root) {
+    const slides = Array.from(root.querySelectorAll('[data-slide]'));
+    const prev = root.querySelector('[data-prev]');
+    const next = root.querySelector('[data-next]');
+    let current = 0;
+    let timer = null;
+    let hovering = false;
+
+    function go(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((el, i) => {
+        const on = i === current;
+        el.classList.toggle('active', on);
+        el.setAttribute('aria-hidden', on ? 'false' : 'true');
+      });
+    }
+
+    function stop() {
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function start() {
+      stop();
+      if (hovering || slides.length <= 1) return;
+      timer = setInterval(() => go(current + 1), 5000);
+    }
+
+    if (prev) prev.addEventListener('click', () => { go(current - 1); start(); });
+    if (next) next.addEventListener('click', () => { go(current + 1); start(); });
+    root.addEventListener('mouseenter', () => { hovering = true; stop(); });
+    root.addEventListener('mouseleave', () => { hovering = false; start(); });
+
+    start();
+  }
+</script>
+
+<style>
+  .carousel {
+    position: relative;
+    overflow: hidden;
+    width: calc(100% + 3rem);
+    max-height: 800px;
+    background: #000;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+          aspect-ratio: 4 / 3;
+    @media(min-width: 768px) {
+    width: calc(100% + 6rem);
+    margin-left: -3rem;
+    margin-right: -3rem;
+    }
+  }
+
+  .slides {
+    position: absolute;
+    inset: 0;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    &[alt="Checler"] {
+    object-position: top;
+    }
+    display: block;
+  }
+
+  .name {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.75rem;
+    @media(min-width: 768px) {
+    font-size: 3.75rem;
+    }
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .prev {
+    left: 0.75rem;
+  }
+
+  .next {
+    right: 0.75rem;
+  }
+
+</style>

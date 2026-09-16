@@ -1,0 +1,66 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import ArtistsCarousel from '../components/ArtistsCarousel.astro';
+
+const entry = await getEntry('pages', 'home');
+const { Content } = await render(entry!);
+---
+
+<Layout>
+	<ArtistsCarousel />
+    <Content />
+</Layout>
+
+<style is:global>
+.wow-image {
+  margin-top: 3rem;
+  position: relative;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    @media(min-width: 768px) {
+    width: calc(100% + 6rem);
+    margin-left: -3rem;
+    margin-right: -3rem;
+    }
+--fill-layer-image-opacity: 0.46;
+  --bg-gradient: radial-gradient(circle at 41.34114583333333% 52.09309895833333%, #0038FF 0%, 25.5%, rgba(0,56,255,0) 51%), radial-gradient(circle at 91.40088399251302% 78.43969980875652%, #0038FF 0%, 28.5%, rgba(0,56,255,0) 57%), radial-gradient(circle at 31.987848281860355% 100%, #000000 0%, 43.319999999999986%, rgba(0,0,0,0) 76%), radial-gradient(circle at 6.4404296875% 15.042317708333334%, #0038FF 0%, 42%, rgba(0,56,255,0) 70%), radial-gradient(circle at 78.75162760416666% 0%, #00E8DA 0%, 41.040000000000006%, rgba(0,232,218,0) 76%), radial-gradient(circle at 48.9013671875% 49.521484375%, #FFFFFF 0%, 100%, rgba(255,255,255,0) 100%);
+  --bg-overlay-color: transparent;
+  & > p:first-child {
+    z-index: 1;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    inset: 0;
+    img {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  .wow-text {
+  padding: 3rem;
+    text-align: center;
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 1.25rem;
+  }
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    &:before {
+    content: "";
+    opacity: .4;
+    background: var(--bg-gradient);
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    }}
+}
+</style>

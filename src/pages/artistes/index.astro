@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { resolveAsset } from '../../lib/assets';
+import { Image } from 'astro:assets';
+
+const artistes = (await getCollection('artistes')).map((entry) => ({
+    cover: resolveAsset(entry.data.image_cover),
+    ...entry
+  }))
+  .filter((s) => Boolean(s.cover)).sort((a, b) => a.id.localeCompare(b.id));
+
+---
+
+<Layout title="Artistes">
+	<h1>Nos artistes</h1>
+		{
+			artistes.map((artiste) => (
+          <a href={`/artistes/${artiste.id}`}>
+            <Image src={artiste.cover} alt={artiste.data.nom} />
+            <span>{artiste.data.nom}</span>
+					</a>
+			))
+		}
+</Layout>
+
+<style>
+a {
+  text-decoration: none;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: block;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  span {
+  color: white;
+  width: 100%;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: 700;
+  }
+}
+</style>
