@@ -14,6 +14,7 @@ const artistes = (await getCollection('artistes')).map((entry) => ({
 
 <Layout title="Artistes">
 	<h1>Nos artistes</h1>
+  <div class="artists">
 		{
 			artistes.map((artiste) => (
           <a href={`/artistes/${artiste.id}`}>
@@ -22,17 +23,29 @@ const artistes = (await getCollection('artistes')).map((entry) => ({
 					</a>
 			))
 		}
+    </div>
 </Layout>
 
 <style>
+  .artists {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    @media (min-width: 1200px) {
+    flex-direction: row;
+    }
+  }
 a {
   text-decoration: none;
   position: relative;
   aspect-ratio: 1 / 1;
   display: block;
+  width: 100%;
   img {
     width: 100%;
-    height: 100%;
+    height: 100% !important;
     object-fit: cover;
   }
   span {
